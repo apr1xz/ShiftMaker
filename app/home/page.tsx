@@ -76,11 +76,11 @@ export default async function HomePage() {
                   <span className="menu-card-desc">スタッフのシフトを確認</span>
                 </Link>
                 <AnnouncementModal />
-                <div className="menu-card fade-up stagger-6" style={{ opacity: 0.4, cursor: 'default' }}>
-                  <div className="menu-card-icon" style={{ background: 'var(--bg-tertiary)' }}>⚙️</div>
+                <Link href="/admin/settings" className="menu-card fade-up stagger-6">
+                  <div className="menu-card-icon" style={{ background: 'rgba(255,149,0,0.1)' }}>⚙️</div>
                   <span className="menu-card-title">店舗設定</span>
-                  <span className="menu-card-desc">準備中</span>
-                </div>
+                  <span className="menu-card-desc">スタッフ管理・設定</span>
+                </Link>
               </>
             )}
           </div>
