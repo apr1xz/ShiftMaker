@@ -109,4 +109,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: '/',
   },
   session: { strategy: 'jwt' },
+  trustHost: true,
 })
