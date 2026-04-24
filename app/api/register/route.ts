@@ -35,7 +35,10 @@ export async function POST(req: NextRequest) {
     .from('users')
     .insert({ name, employee_id, password: hashed })
 
-  if (error) return NextResponse.json({ error: 'DB エラー' }, { status: 500 })
+  if (error) {
+    console.error('Supabase insert error:', JSON.stringify(error))
+    return NextResponse.json({ error: `DB エラー: ${error.message} (code: ${error.code})` }, { status: 500 })
+  }
 
   return NextResponse.json({ ok: true })
 }
