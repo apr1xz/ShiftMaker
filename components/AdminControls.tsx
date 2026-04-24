@@ -17,6 +17,8 @@ export default function AdminControls({ users }: Props) {
     isAvailable: boolean; startTime: string; endTime: string;
   } | null>(null)
   const [editStatus, setEditStatus] = useState(1)
+  const [deleteUserOpen, setDeleteUserOpen] = useState(false)
+  const [deleteUserId, setDeleteUserId] = useState<number>(users[0]?.id ?? 0)
 
   // Intercept table cell clicks for shift editing
   useEffect(() => {
@@ -91,9 +93,24 @@ export default function AdminControls({ users }: Props) {
     else alert('更新失敗: ' + data.error)
   }
 
+  async function deleteUser() {
+    const target = users.find((u) => u.id === deleteUserId)
+    if (!target) return
+    if (!confirm(`「${target.name}」を削除しますか？\nシフトデータも全て削除されます。`)) return
+    const res = await fetch('/api/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: target.id }),
+    })
+    const data = await res.json()
+    if (data.success) { setDeleteUserOpen(false); location.reload() }
+    else alert('削除失敗: ' + data.error)
+  }
+
   return (
     <>
       <button onClick={() => setBulkOpen(true)} className="btn btn-secondary btn-sm">時給一括</button>
+      <button onClick={() => { setDeleteUserId(users[0]?.id ?? 0); setDeleteUserOpen(true) }} className="btn btn-secondary btn-sm" style={{ color: 'var(--red)' }}>削除</button>
 
       {/* Individual wage modal */}
       {wageUser && createPortal(
@@ -164,6 +181,34 @@ export default function AdminControls({ users }: Props) {
             <div className="modal-actions">
               <button onClick={() => setEditShift(null)} className="btn btn-secondary">キャンセル</button>
               <button onClick={saveShiftUpdate} className="btn">保存</button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Delete user modal */}
+      {deleteUserOpen && createPortal(
+        <div className="modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) setDeleteUserOpen(false) }}>
+          <div className="modal-content">
+            <h3 className="modal-title">スタッフ削除</h3>
+            <p className="modal-subtitle" style={{ color: 'var(--red)' }}>削除するとシフトデータも全て消えます</p>
+            <div className="form-group">
+              <label className="form-label">対象スタッフ</label>
+              <select
+                className="form-input"
+                value={deleteUserId}
+                onChange={(e) => setDeleteUserId(Number(e.target.value))}
+                style={{ cursor: 'pointer' }}
+              >
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button onClick={() => setDeleteUserOpen(false)} className="btn btn-secondary">キャンセル</button>
+              <button onClick={deleteUser} className="btn" style={{ background: 'var(--red)', boxShadow: 'none' }}>削除する</button>
             </div>
           </div>
         </div>,

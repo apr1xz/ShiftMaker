@@ -381,6 +381,20 @@ textarea.form-input { height:auto; padding:12px; min-height:120px; }
   .menu-card { padding:20px; }
   .status-widget { padding:24px; }
   .modal-content { padding:24px; max-width:100%; border-radius:var(--radius-lg); }
+  .home-greeting h2 { font-size:13px; }
+  .home-greeting h1 { font-size:22px; }
+  .status-title { font-size:20px; }
+  .status-subtitle { font-size:13px; }
+}
+
+/* Light mode calendar */
+@media (prefers-color-scheme: light) {
+  .calendar-day { background:#e5e5ea; }
+  .calendar-day:hover { background:#d1d1d6; }
+  .calendar-day[data-available="true"] { background:rgba(52,199,89,0.22); }
+  .calendar-day[data-available="false"] { background:rgba(255,59,48,0.15); }
+  .calendar-day.selected[data-available="true"] { background:rgba(52,199,89,0.32); }
+  .calendar-day.selected[data-available="false"] { background:rgba(255,59,48,0.25); }
 }
 
 /* Admin Mobile View */
