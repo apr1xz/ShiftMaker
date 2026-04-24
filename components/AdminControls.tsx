@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface UserInfo { id: number; name: string; hourly_wage: number }
 
@@ -95,7 +96,7 @@ export default function AdminControls({ users }: Props) {
       <button onClick={() => setBulkOpen(true)} className="btn btn-secondary btn-sm">時給一括</button>
 
       {/* Individual wage modal */}
-      {wageUser && (
+      {wageUser && createPortal(
         <div className="modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) setWageUser(null) }}>
           <div className="modal-content">
             <h3 className="modal-title">時給設定</h3>
@@ -109,11 +110,12 @@ export default function AdminControls({ users }: Props) {
               <button onClick={saveWage} className="btn">保存</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Bulk wage modal */}
-      {bulkOpen && (
+      {bulkOpen && createPortal(
         <div className="modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) setBulkOpen(false) }}>
           <div className="modal-content">
             <h3 className="modal-title">時給一括設定</h3>
@@ -127,11 +129,12 @@ export default function AdminControls({ users }: Props) {
               <button onClick={saveBulkWage} className="btn">一括更新</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Edit shift modal */}
-      {editShift && (
+      {editShift && createPortal(
         <div className="modal-overlay active" onClick={(e) => { if (e.target === e.currentTarget) setEditShift(null) }}>
           <div className="modal-content">
             <h3 className="modal-title">シフト編集</h3>
@@ -163,7 +166,8 @@ export default function AdminControls({ users }: Props) {
               <button onClick={saveShiftUpdate} className="btn">保存</button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
