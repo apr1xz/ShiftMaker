@@ -6,6 +6,7 @@ import { getHolidaysForYears } from '@/lib/holidays'
 import { calcViewPeriod, dateRange, formatDate, prevMonthParam, nextMonthParam } from '@/lib/period'
 import SignOutButton from '@/components/SignOutButton'
 import AdminControls from '@/components/AdminControls'
+import AdminMobileView from '@/components/AdminMobileView'
 
 const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土']
 
@@ -19,7 +20,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const years = [...new Set([startDate.getFullYear(), endDate.getFullYear()])]
 
   const [usersRes, shiftsRes, holidays] = await Promise.all([
-    supabaseAdmin.from('users').select('id, name, employee_id, hourly_wage').order('id'),
+    supabaseAdmin.from('users').select('id, name, employee_id, hourly_wage').order('employee_id'),
     supabaseAdmin
       .from('shift_requests')
       .select('user_id, target_date, is_available, start_time, end_time')
@@ -42,6 +43,16 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     userHours[s.user_id] = (userHours[s.user_id] ?? 0) + (eh * 60 + em - sh * 60 - sm) / 60
   }
 
+  const shiftsByUser: Record<number, Record<string, { is_available: boolean; start_time: string | null; end_time: string | null }>> = {}
+  for (const s of shifts) {
+    if (!shiftsByUser[s.user_id]) shiftsByUser[s.user_id] = {}
+    shiftsByUser[s.user_id][s.target_date] = {
+      is_available: s.is_available,
+      start_time: s.start_time,
+      end_time: s.end_time,
+    }
+  }
+
   const dailyCount: Record<string, number> = {}
   for (const s of shifts) {
     if (s.is_available) dailyCount[s.target_date] = (dailyCount[s.target_date] ?? 0) + 1
@@ -50,6 +61,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const prev = prevMonthParam(startDate)
   const next = nextMonthParam(startDate)
   const fmt = (d: Date) => `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`
+  const periodLabel = `${fmt(startDate)} 〜 ${fmt(endDate)}`
   const exportMonth = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`
 
   return (
@@ -72,7 +84,17 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             </div>
           </div>
 
-          <div className="table-container fade-up stagger-1">
+          <AdminMobileView
+            users={users.map((u) => ({ id: u.id, name: u.name, employee_id: u.employee_id, hourly_wage: u.hourly_wage }))}
+            shiftsByUser={shiftsByUser}
+            dates={dates.map(formatDate)}
+            holidays={holidays}
+            prev={prev}
+            next={next}
+            periodLabel={periodLabel}
+          />
+
+          <div className="table-container fade-up stagger-1 admin-desktop-only">
             <div className="table-header">
               <div className="flex items-center gap-2">
                 <Link href={`/admin?month=${prev}`} className="btn btn-ghost btn-sm">◀︎</Link>

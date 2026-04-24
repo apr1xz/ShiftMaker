@@ -383,6 +383,39 @@ textarea.form-input { height:auto; padding:12px; min-height:120px; }
   .modal-content { padding:24px; max-width:100%; border-radius:var(--radius-lg); }
 }
 
+/* Admin Mobile View */
+.admin-mobile-view { display:none; }
+.admin-desktop-only { display:block; }
+
+@media (max-width:768px) {
+  .admin-mobile-view { display:block; }
+  .admin-desktop-only { display:none !important; }
+
+  .admin-mobile-period {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 0 12px;
+  }
+
+  .admin-mobile-selector {
+    display:flex; align-items:center; gap:8px; margin-bottom:12px;
+  }
+
+  .admin-mobile-select {
+    flex:1; background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius-md); color:var(--text-primary);
+    padding:8px 12px; font-size:16px; -webkit-appearance:auto; appearance:auto;
+    outline:none;
+  }
+  .admin-mobile-select:focus { border-color:var(--blue); }
+
+  .admin-mobile-user-info {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 14px; margin-bottom:12px;
+    background:var(--surface); border-radius:var(--radius-md);
+    border:1px solid var(--border);
+  }
+}
+
 @media (max-width:480px) {
   .login-page { padding:16px; }
   .login-logo { margin-bottom:24px; }
