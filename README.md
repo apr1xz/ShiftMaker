@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Shift Maker — Next.js + TypeScript + Supabase
 
-## Getting Started
+PHP版からの移植プロジェクト。
 
-First, run the development server:
+## セットアップ
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 1. Supabase プロジェクト作成
+
+[supabase.com](https://supabase.com) でプロジェクトを作成し、`supabase/schema.sql` を SQL Editor で実行。
+
+管理者アカウントは以下のスクリプトで作成（Node.js で実行）:
+
+```js
+const bcrypt = require('bcryptjs')
+const { createClient } = require('@supabase/supabase-js')
+
+const supabase = createClient('YOUR_URL', 'YOUR_SERVICE_ROLE_KEY', { auth: { persistSession: false } })
+
+async function main() {
+  const hash = await bcrypt.hash('YOUR_ADMIN_PASSWORD', 10)
+  await supabase.from('admins').insert({ username: 'admin', password: hash })
+  console.log('Done')
+}
+main()
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. 環境変数の設定
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`.env.local` を編集:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+AUTH_SECRET=32文字以上のランダム文字列
+```
 
-## Learn More
+`AUTH_SECRET` は `openssl rand -base64 32` で生成。
 
-To learn more about Next.js, take a look at the following resources:
+### 3. 起動
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 画面構成
 
-## Deploy on Vercel
+| URL | 説明 |
+|-----|------|
+| `/` | ログイン / 新規登録 |
+| `/home` | ホーム（お知らせ・メニュー） |
+| `/shift/input` | シフト入力（カレンダー） |
+| `/shift/view` | シフト確認・給与確認 |
+| `/admin` | 管理者：シフト一覧・編集 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## API
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| メソッド | URL | 説明 |
+|----------|-----|------|
+| GET/POST | `/api/shifts` | シフト取得・保存 |
+| POST | `/api/shifts/admin` | 管理者によるシフト更新 |
+| POST/DELETE | `/api/templates` | テンプレート保存・削除 |
+| GET/POST | `/api/announcements` | お知らせ一覧・作成 |
+| POST | `/api/wages` | 時給更新 |
+| GET | `/api/export` | CSV出力 |
+| POST | `/api/register` | 従業員登録 |
+
+## 技術スタック
+
+- **フレームワーク**: Next.js 16 (App Router)
+- **言語**: TypeScript
+- **認証**: NextAuth.js v5 (Credentials)
+- **DB**: Supabase (PostgreSQL)
+- **パスワード**: bcryptjs
+- **スタイル**: CSS Custom Properties (オリジナルデザインを移植)
