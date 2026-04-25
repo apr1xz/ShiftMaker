@@ -30,10 +30,17 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const { data: wageRow } = await supabaseAdmin
+    .from('store_settings')
+    .select('value')
+    .eq('key', 'default_hourly_wage')
+    .single()
+  const hourly_wage = Number(wageRow?.value ?? 1000) || 1000
+
   const hashed = await bcrypt.hash(password, 10)
   const { error } = await supabaseAdmin
     .from('users')
-    .insert({ name, employee_id, password: hashed })
+    .insert({ name, employee_id, password: hashed, hourly_wage })
 
   if (error) {
     console.error('Supabase insert error:', JSON.stringify(error))

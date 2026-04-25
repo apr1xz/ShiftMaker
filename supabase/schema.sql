@@ -53,6 +53,15 @@ CREATE TABLE IF NOT EXISTS announcements (
   created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
+-- 店舗設定テーブル
+CREATE TABLE IF NOT EXISTS store_settings (
+  key   VARCHAR(50) PRIMARY KEY,
+  value TEXT        NOT NULL
+);
+INSERT INTO store_settings (key, value)
+  VALUES ('default_hourly_wage', '1000')
+  ON CONFLICT (key) DO NOTHING;
+
 -- インデックス
 CREATE INDEX IF NOT EXISTS idx_shift_requests_user_date
   ON shift_requests(user_id, target_date);
