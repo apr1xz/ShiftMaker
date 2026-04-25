@@ -38,10 +38,7 @@ export function calcViewPeriod(monthParam?: string): { startDate: Date; endDate:
     baseDate = new Date(monthParam + '-01')
     if (isNaN(baseDate.getTime())) baseDate = new Date()
   } else {
-    baseDate = new Date()
-    if (baseDate.getDate() < 11) {
-      baseDate.setMonth(baseDate.getMonth() - 1)
-    }
+    baseDate = calcShiftPeriod().startDate
   }
 
   const startDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), 11)
