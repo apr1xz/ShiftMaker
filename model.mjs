@@ -27,3 +27,17 @@ export function duration(shift) {
   if (diff < 0) diff += 1440;
   return diff;
 }
+
+// A period is named by its start month: the 11th through the next month's 10th.
+export function currentPeriod(today = new Date()) {
+  const start = new Date(today.getFullYear(), today.getMonth() - (today.getDate() <= 10 ? 1 : 0), 11);
+  return { year: start.getFullYear(), month: start.getMonth() };
+}
+export function periodDates(year, month) {
+  const end = new Date(year, month + 1, 10);
+  const result = [];
+  for (const day = new Date(year, month, 11); day <= end; day.setDate(day.getDate() + 1)) {
+    result.push(dateKey(day.getFullYear(), day.getMonth(), day.getDate()));
+  }
+  return result;
+}
